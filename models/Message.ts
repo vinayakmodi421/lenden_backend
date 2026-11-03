@@ -19,6 +19,7 @@ export class Message extends Model<
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   declare user?: NonAttribute<User>;
+  declare msgUsername: CreationOptional<string | null>;
 }
 
 export function initMessage(sequelize: Sequelize): typeof Message {
@@ -33,6 +34,11 @@ export function initMessage(sequelize: Sequelize): typeof Message {
       deactivated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE,
+      msgUsername: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+        field: "msg_username",
+      },
     },
     { sequelize, tableName: "messages", modelName: "Message", underscored: true },
   );

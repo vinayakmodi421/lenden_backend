@@ -14,15 +14,12 @@ export const initializeSocket = (io: Server , redisClient : any) => {
     io.use((socket, next) => {
     const accessSecret = process.env.ACCESS_TOKEN_SECRET;
         try {
-        // console.log("hi")
         const cookieHeader = socket.handshake.headers.cookie;
         if (!cookieHeader) {
             return next(new Error("Unauthorized: No cookies found"));
         }
         const cookies = cookie.parse(cookieHeader);
-        // console.log(cookies)
         const accessToken = cookies.accessToken
-        // console.log("socket Autherization:", accessToken )
         if (!accessToken) {
             return next(new Error("Access token missing"));
         }
@@ -45,9 +42,12 @@ export const initializeSocket = (io: Server , redisClient : any) => {
         socket.on("message", async (data) => {
             const obj = await messageSent(data)
             const id = await findGroupMember(data)
-            const userId : any = await redisClient.hmGet("Users" ,id);
+            let userId : any = []
+            if(id.length > 0){
+                userId = await redisClient.hmGet("Users" ,id);
+            }
             userId.forEach((id :any ) => {
-                // console.log("sent through socket" , id , obj)
+                
                 io.to(id).emit("text", obj);
             });
         });

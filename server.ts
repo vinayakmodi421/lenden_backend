@@ -18,6 +18,7 @@ import morgan from "morgan";
 import notificationRouters from "./routers/Notifications.js";
 import expensesRouter from "./routers/ExpensesRouter.js";
 import { initializeSocket } from "./socket/Index.js";
+import msgRouter from "./routers/MessagesRouter.js";
 
 
 const redisClient = createClient({
@@ -36,7 +37,7 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 
 app.use(cors({
-  origin : "http://localhost:5173",
+  origin : ["http://localhost:5173","http://192.168.1.5:5173"],
   credentials : true,
 }));
 app.use(express.json());
@@ -44,6 +45,7 @@ app.use("/api",authRouter)
 app.use("/api",chatRouter)
 app.use("/api",notificationRouters)
 app.use("/api" ,expensesRouter)
+app.use("/api" ,msgRouter)
 
 app.get("/", (_req: Request, res: Response) => {
   res.json({

@@ -3,6 +3,7 @@ import { Expense, initExpense } from "./Expense.js";
 import { Group, initGroup } from "./Group.js";
 import { GroupMember, initGroupMember } from "./GroupMember.js";
 import { Message, initMessage } from "./Message.js";
+import { MessageReceipt, initMessageReceipt } from "./MsgStatus.js";
 import { Notification, initNotification } from "./Notification.js";
 import { Otp, initOtp } from "./Otp.js";
 import { Receipt, initReceipt } from "./Receipt.js";
@@ -16,12 +17,14 @@ export function initModels(sequelize: Sequelize) {
   initGroupMember(sequelize);
   initExpense(sequelize);
   initMessage(sequelize);
+  initMessageReceipt(sequelize);
   initRequest(sequelize);
   initReceipt(sequelize);
   initOtp(sequelize);
   initNotification(sequelize);
   initRefreshToken(sequelize)
 
+  // group and its member
   Group.hasMany(GroupMember, {
     foreignKey: "groupId",
     sourceKey: "id",
@@ -34,6 +37,7 @@ export function initModels(sequelize: Sequelize) {
     as: "group",
   });
 
+  // messages and its user
   User.hasMany(Message, {
     foreignKey: "userId",
     sourceKey: "id",
@@ -45,6 +49,7 @@ export function initModels(sequelize: Sequelize) {
     as: "user",
   });
 
+  // expense and its notification
   Expense.hasMany(Notification, {
     foreignKey: "expenseId",
     as: "notifications",
@@ -54,6 +59,7 @@ export function initModels(sequelize: Sequelize) {
     as: "expense",
   });
 
+  // request and its notification
   Request.hasMany(Notification, {
     foreignKey: "requestId",
     as: "notifications",
@@ -63,19 +69,58 @@ export function initModels(sequelize: Sequelize) {
     as: "request",
   });
   
+  // groupMember and its user
   GroupMember.hasOne(User, {
     sourceKey: 'userId',
     foreignKey: 'id',
     as: 'user',
   });
-
   User.belongsTo(GroupMember, {
     targetKey: 'userId',
     foreignKey: 'id',
     as: 'user',
   });
 
-  return { User, Group, GroupMember, Expense, Message, Request, Receipt, Otp, Notification , RefreshToken };
+  // group and its messages
+  Group.hasMany(Message , {
+    sourceKey : "id",
+    foreignKey : "groupId",
+    as : "messages",
+  })
+
+  Message.belongsTo(Group , {
+    targetKey : "id",
+    foreignKey : "groupId",
+    as : "messages",
+  })
+
+  // group last msg and its messages
+  Group.hasOne(Message , {
+    sourceKey : "lastMessageId",
+    foreignKey : "id",
+    as : "lastMessage",
+  })
+
+  Message.belongsTo(Group , {
+    targetKey : "lastMessageId",
+    foreignKey : "id",
+    as : "lastMessage",
+  })
+
+  //groupMember and its messages
+  GroupMember.hasMany(Message , {
+    sourceKey : "groupId",
+    foreignKey : "groupId",
+    as : "latestMsg",
+  })
+
+  Message.belongsTo(GroupMember , {
+    targetKey : "groupId",
+    foreignKey : "groupId",
+    as : "latestMsg",
+  })
+
+  return { User, Group, GroupMember, Expense, Message, MessageReceipt, Request, Receipt, Otp, Notification , RefreshToken };
 }
 
-export { User, Group, GroupMember, Expense, Message, Request, Receipt, Otp, Notification , RefreshToken };
+export { User, Group, GroupMember, Expense, Message, MessageReceipt, Request, Receipt, Otp, Notification , RefreshToken };

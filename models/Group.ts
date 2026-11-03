@@ -18,6 +18,7 @@ export class Group extends Model<
   declare deactivated: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  declare lastMessageId: CreationOptional<number | null>;
 }
 
 export function initGroup(sequelize: Sequelize): typeof Group {
@@ -63,7 +64,11 @@ export function initGroup(sequelize: Sequelize): typeof Group {
         allowNull: false,
         defaultValue: false,
       },
-
+      lastMessageId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: "last_message_id",
+      },
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE,
     },

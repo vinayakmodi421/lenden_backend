@@ -87,9 +87,7 @@ export const requestToJoin = async (req : Request , res : Response , next : any)
 
 export const fetchGroups = async (req : Request , res : Response , next : any) : Promise<void> => {
     try{
-        // const body = req.body
         const id = req.params.id
-        // console.log(id);
         const response = await GroupMember.findAll({
             where : {
                 userId : id,
@@ -100,39 +98,22 @@ export const fetchGroups = async (req : Request , res : Response , next : any) :
                     model : Group,
                     as : "group",
                     where: { deactivated: false },
-                }
-            ]
+                    include : [
+                        {
+                            model : Message,
+                            as : "lastMessage"
+                        }
+                    ]
+                },
+            ],
+            attributes : ["isAdmin", "userId"]
         })
-        console.log("res",response.length)
         res.json({
             status : 200,
             message : "groups fetched",
             data : response
         })
         
-    }catch(error){
-        next(error)
-    }
-}
-export const fetchAllMessages = async (req : Request , res : Response , next : any) : Promise<void> => {
-    try{
-        // const body = req.body
-        const id = req.params.id
-        // console.log(id);
-        const response = await Message.findAll({
-            where : {
-                groupId : id,
-                deactivated: false,
-            },include : [
-                {model : User, attributes : ["username"] ,as : "user"}
-            ]
-        })
-        console.log(response)
-        res.json({
-            status : 200,
-            message : "Messages fetched",
-            data : response
-        })
     }catch(error){
         next(error)
     }
