@@ -29,7 +29,7 @@ export function initMessage(sequelize: Sequelize): typeof Message {
       groupId: { type: DataTypes.INTEGER, allowNull: false, field: "group_id" },
       userId: { type: DataTypes.INTEGER, allowNull: false, field: "user_id" },
       text: { type: DataTypes.TEXT, allowNull: false },
-      status: { type: DataTypes.ENUM("sent", "delivered", "read"), allowNull: false, defaultValue: "sent" },
+      status: { type: DataTypes.ENUM("sent", "delivered", "seen"), allowNull: false, defaultValue: "sent" },
       messageType: { type: DataTypes.ENUM("text", "image", "system", "expense"), allowNull: false, defaultValue: "text", field: "message_type" },
       deactivated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       createdAt: DataTypes.DATE,

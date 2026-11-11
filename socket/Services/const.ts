@@ -25,7 +25,6 @@ export const findAllGroupMember = async (data : any) => {
         },
         attributes : ["userId"],
     })
-
     const id = res.map((ele :any ) => {
         return `userId:${ele.dataValues.userId}`
     })

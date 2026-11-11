@@ -7,6 +7,7 @@ import { GroupMember } from "../models/GroupMember.js";
 import { Op } from "sequelize";
 import { addExpense } from "./Handler/ExpensesHandler.js";
 import { findAllGroupMember, findGroupMember } from "./Services/const.js";
+import { publishMsgDelivered, publishMsgSeen } from "../services/KafkaProducer.js";
 
 
 export const initializeSocket = (io: Server , redisClient : any) => {
@@ -40,6 +41,7 @@ export const initializeSocket = (io: Server , redisClient : any) => {
         console.log("User connected:", socket.id , socket.data);
         await redisClient.hSet("Users",`userId:${socket.data.userId}`, socket.id);
         socket.on("message", async (data) => {
+            console.log("sent")
             const obj = await messageSent(data)
             const id = await findGroupMember(data)
             let userId : any = []
@@ -71,6 +73,18 @@ export const initializeSocket = (io: Server , redisClient : any) => {
             userId.forEach((id :any ) => {
                 io.to(id).emit("text", obj.dataValues);
             });
+        })
+
+        socket.on("delivered" , async (data) => {
+            // console.log(data)
+            console.log("deliver")
+            await publishMsgDelivered(data)
+            return
+        })
+
+        socket.on("seen" , async (data) => {
+            console.log("seen")
+            await publishMsgSeen(data)
         })
 
         socket.on("disconnect", async (reason  :any) => {

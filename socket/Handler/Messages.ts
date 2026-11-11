@@ -4,6 +4,7 @@ import { Message } from "../../models/Message.js";
 import { Notification } from "../../models/Notification.js";
 import { Request } from "../../models/Request.js";
 import { User } from "../../models/User.js";
+import { publishMsgCreated } from "../../services/KafkaProducer.js";
 
 export const messageSent = async (data : any) => {
     let obj = {
@@ -11,7 +12,6 @@ export const messageSent = async (data : any) => {
         deactivated : 0,
     }
     const createdMessage = await Message.create(obj);
-    console.log(data , createdMessage)
     const lastMsg = await Group.update({
         lastMessageId : createdMessage.dataValues.id
     },{
@@ -19,12 +19,8 @@ export const messageSent = async (data : any) => {
             id : data.groupId,
         }
     })
-
-    const response = await Message.findByPk(createdMessage.id, {
-        include: [
-            { model: User, as: "user", attributes: ["username"] },
-        ],
-    });
+    await publishMsgCreated({...data , messageId : createdMessage.dataValues.id})
+    const response = await Message.findByPk(createdMessage.id);
     return response?.toJSON()
 }
 
@@ -84,5 +80,4 @@ export const addMember = async (data : any) => {
             id : data.requestId
         }
     })
-    // console.log(response)
 }

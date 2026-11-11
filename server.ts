@@ -19,7 +19,8 @@ import notificationRouters from "./routers/Notifications.js";
 import expensesRouter from "./routers/ExpensesRouter.js";
 import { initializeSocket } from "./socket/Index.js";
 import msgRouter from "./routers/MessagesRouter.js";
-
+import { producer } from "./kafka.js";
+await producer.connect();
 
 const redisClient = createClient({
   url: "redis://localhost:6379"
